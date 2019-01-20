@@ -1,5 +1,20 @@
 Docker is a Container runtime, there are number of other Container like Lxc / Rkt / containerd. But Docker is the most popluar runtime out there. 
 
+Containerization is increasingly popular because containers are:
+
+Flexible: Even the most complex applications can be containerized.
+Lightweight: Containers leverage and share the host kernel.
+Interchangeable: You can deploy updates and upgrades on-the-fly.
+Portable: You can build locally, deploy to the cloud, and run anywhere.
+Scalable: You can increase and automatically distribute container replicas.
+Stackable: You can stack services vertically and on-the-fly.
+
+image is an executable package that includes everything needed to run an application--the code, a runtime, libraries, environment variables, and configuration files.
+
+A container is a runtime instance of an image--what the image becomes in memory when executed (that is, an image with state, or a user process). You can see a list of your running containers with the command, docker ps, just as you would in Linux.
+
+A container runs natively on Linux and shares the kernel of the host machine with other containers. It runs a discrete process, taking no more memory than any other executable, making it lightweight.
+
 Containers are uses Linux namespaces and cgroups. Namespaces let you virtualize system resources, like the file system or networking. Cgroups provide a way to limit the amount of resources like CPU and memory that each container can use. 
 
 Docker Container are Isolated process, they are not Virtual Machine. 
@@ -127,3 +142,59 @@ daemon.json
   "max-size": "10m",
   "max-file": "1000"
 }
+
+You can also tunnel the Docker socket over SSH to remotely run commands
+ssh -i <path-to-ssh-key> -NL localhost:2374:/var/run/docker.sock username@<ssh-host> &
+ docker -H localhost:2374 info
+
+ Docker CE on Ubuntu supports overlay2 and aufs storage drivers.
+Docker CE uses the overlay2 storage driver by default
+
+Specify DNS servers for Docker
+sudo nano /etc/docker/daemon.json
+{
+	"dns": ["8.8.8.8", "8.8.4.4"]
+}
+Detailed Debugging
+{
+  "debug": true
+}
+
+
+docker container rm $(docker container ls -a -q)         # Remove all containers
+docker image rm $(docker image ls -a -q)   # Remove all images from this machine
+docker tag <image> username/repository:tag  # Tag <image> for upload to registry
+docker run -d -p 4000:80 friendlyhello         # Same thing, but in detached mode
+docker run -p 4000:80 friendlyhello  # Run "friendlyname" mapping port 4000 to 80
+
+Docker Engine is a client-server application with these major components:
+A server which is a type of long-running program called a daemon process (the dockerd command).
+A REST API which specifies interfaces that programs can use to talk to the daemon and instruct it what to do.
+A command line interface (CLI) client (the docker command).
+
+
+Docker uses a technology called namespaces to provide the isolated workspace called the container. 
+Docker creates a set of namespaces for that container
+These namespaces provide a layer of isolation, Each aspect of a container runs in a separate namespace 
+
+The pid namespace: Process isolation (PID: Process ID).
+The net namespace: Managing network interfaces (NET: Networking).
+The ipc namespace: Managing access to IPC resources (IPC: InterProcess Communication).
+The mnt namespace: Managing filesystem mount points (MNT: Mount).
+The uts namespace: Isolating kernel and version identifiers. (UTS: Unix Timesharing System).
+
+Control Groups 
+Docker Engine on Linux also relies on another technology called control groups (cgroups). A cgroup limits an application to a specific set of resources. 
+
+Union File System
+Union file systems, or UnionFS, are file systems that operate by creating layers, making them very lightweight and fast. e.g  AUFS, btrfs, vfs, and DeviceMapper.
+
+Container Format 
+Docker Engine combines the namespaces, control groups, and UnionFS into a wrapper called a container format. The default container format is libcontainer
+
+Volumes
+Bind Mounts is usefule for Development, mounting the local directory to Docker Container
+For Production use case use Volumes
+
+If you do not want to use the cache at all, you can use the --no-cache=true option on the docker build
+Docker looks for an existing image in its cache that it can reuse, rather than creating a new (duplicate) image.
